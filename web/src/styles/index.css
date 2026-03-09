@@ -1,0 +1,151 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --shark-primary: #0ea5e9;
+  --shark-secondary: #38bdf8;
+  --shark-accent: #7dd3fc;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #0f172a;
+  color: #f8fafc;
+  line-height: 1.6;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* CodeMirror dark theme overrides */
+.cm-editor {
+  background-color: #1e293b !important;
+  border-radius: 0.5rem;
+  border: 1px solid #334155;
+}
+
+.cm-editor .cm-gutters {
+  background-color: #0f172a !important;
+  border-right: 1px solid #334155;
+}
+
+.cm-editor .cm-activeLineGutter {
+  background-color: #1e293b !important;
+}
+
+.cm-editor .cm-activeLine {
+  background-color: rgba(14, 165, 233, 0.1) !important;
+}
+
+/* BPF syntax highlighting */
+.cm-keyword {
+  color: #c084fc !important;
+  font-weight: 600;
+}
+
+.cm-operator {
+  color: #f472b6 !important;
+}
+
+.cm-number {
+  color: #fbbf24 !important;
+}
+
+.cm-string {
+  color: #4ade80 !important;
+}
+
+.cm-comment {
+  color: #64748b !important;
+  font-style: italic;
+}
+
+/* Packet table styles */
+.packet-row {
+  transition: background-color 0.15s ease;
+}
+
+.packet-row:hover {
+  background-color: rgba(14, 165, 233, 0.1);
+}
+
+.packet-row.selected {
+  background-color: rgba(14, 165, 233, 0.2);
+}
+
+/* Drag and drop zone */
+.drag-active {
+  border-color: var(--shark-primary) !important;
+  background-color: rgba(14, 165, 233, 0.1) !important;
+}
+
+/* Modal overlay */
+.modal-overlay {
+  background-color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+}
+
+/* Chart tooltip */
+.recharts-tooltip-wrapper {
+  outline: none;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Button styles */
+.btn-primary {
+  @apply bg-shark-600 hover:bg-shark-500 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+}
+
+.btn-secondary {
+  @apply bg-dark-surface hover:bg-gray-700 text-dark-text font-medium py-2 px-4 rounded-lg border border-dark-border transition-colors duration-200;
+}
+
+/* Card styles */
+.card {
+  @apply bg-dark-surface rounded-xl border border-dark-border p-6;
+}
+
+/* Input styles */
+.input {
+  @apply bg-dark-surface border border-dark-border rounded-lg px-4 py-2 text-dark-text placeholder-dark-muted focus:outline-none focus:ring-2 focus:ring-shark-500 focus:border-transparent;
+}
