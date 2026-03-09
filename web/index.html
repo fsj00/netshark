@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetShark - 网络数据包分析工具</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦈</text></svg>">
+</head>
+<body>
+    <!-- 头部导航 -->
+    <header class="header">
+        <div class="header-left">
+            <span class="logo">🦈 NetShark</span>
+            <nav class="nav">
+                <a href="#" class="nav-link active" data-view="upload">上传</a>
+                <a href="#" class="nav-link" data-view="files">文件</a>
+                <a href="#" class="nav-link" data-view="analyze">分析</a>
+            </nav>
+        </div>
+        <div class="header-right">
+            <span class="status-indicator" id="connectionStatus">
+                <span class="status-dot"></span>
+                <span class="status-text">就绪</span>
+            </span>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+        <!-- 上传视图 -->
+        <section class="view" id="uploadView">
+            <div class="upload-container">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📁</div>
+                    <h2>拖拽 PCAP 文件到此处</h2>
+                    <p>或点击选择文件</p>
+                    <input type="file" id="fileInput" accept=".pcap,.pcapng,.cap" hidden>
+                    <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                        选择文件
+                    </button>
+                </div>
+                <div class="upload-progress" id="uploadProgress" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-info">
+                        <span id="progressText">0%</span>
+                        <span id="progressSpeed"></span>
+                    </div>
+                    <div class="hash-info" id="hashInfo">
+                        <span>计算 SHA256...</span>
+                    </div>
+                </div>
+                <div class="uploaded-files" id="uploadedFiles">
+                    <h3>已上传文件</h3>
+                    <div class="file-list" id="recentFiles"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 文件列表视图 -->
+        <section class="view hidden" id="filesView">
+            <div class="files-container">
+                <div class="view-header">
+                    <h2>已上传文件</h2>
+                    <button class="btn btn-secondary" id="refreshFilesBtn">刷新</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="filesTable">
+                        <thead>
+                            <tr>
+                                <th>文件名</th>
+                                <th>大小</th>
+                                <th>上传时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="filesTableBody"></tbody>
+                    </table>
+                </div>
+                <div class="empty-state" id="filesEmptyState" style="display: none;">
+                    <div class="empty-icon">📂</div>
+                    <p>暂无文件</p>
+                    <button class="btn btn-primary" onclick="app.navigate('upload')">上传文件</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 分析视图 -->
+        <section class="view hidden" id="analyzeView">
+            <div class="analyze-container">
+                <!-- 会话选择 -->
+                <div class="session-bar" id="sessionBar">
+                    <select class="session-select" id="sessionSelect">
+                        <option value="">选择会话...</option>
+                    </select>
+                    <button class="btn btn-primary" id="newSessionBtn">新建分析</button>
+                </div>
+
+                <!-- 分析内容 -->
+                <div class="analyze-content" id="analyzeContent" style="display: none;">
+                    <!-- 统计面板 -->
+                    <div class="stats-panel" id="statsPanel">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-value" id="statTotalPackets">-</div>
+                                <div class="stat-label">数据包</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="statTotalBytes">-</div>
+                                <div class="stat-label">总流量</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="statDuration">-</div>
+                                <div class="stat-label">时长</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="statProtocols">-</div>
+                                <div class="stat-label">协议数</div>
+                            </div>
+                        </div>
+                        <div class="charts-container">
+                            <div class="chart-wrapper">
+                                <h4>协议分布</h4>
+                                <canvas id="protocolChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 数据包列表 -->
+                    <div class="packets-section">
+                        <div class="packets-toolbar">
+                            <div class="search-box">
+                                <input type="text" id="packetFilter" placeholder="过滤数据包 (例如: tcp, ip.addr==192.168.1.1)">
+                                <button class="btn btn-icon" id="applyFilterBtn">🔍</button>
+                            </div>
+                            <div class="packets-info">
+                                <span id="packetsInfoText">显示 0 / 0 个数据包</span>
+                            </div>
+                        </div>
+                        <div class="packets-container">
+                            <div class="virtual-list" id="packetList">
+                                <div class="list-header">
+                                    <div class="col-num" data-sort="num">No.</div>
+                                    <div class="col-time" data-sort="time">时间</div>
+                                    <div class="col-src" data-sort="src">源地址</div>
+                                    <div class="col-dst" data-sort="dst">目标地址</div>
+                                    <div class="col-proto" data-sort="protocol">协议</div>
+                                    <div class="col-len" data-sort="length">长度</div>
+                                    <div class="col-info">信息</div>
+                                </div>
+                                <div class="list-body" id="packetListBody"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 详情面板 -->
+                    <div class="detail-panel" id="detailPanel" style="display: none;">
+                        <div class="detail-tabs">
+                            <button class="tab-btn active" data-tab="tree">协议树</button>
+                            <button class="tab-btn" data-tab="hex">十六进制</button>
+                            <button class="tab-btn" data-tab="raw">原始数据</button>
+                        </div>
+                        <div class="detail-content">
+                            <div class="tab-panel active" id="treePanel">
+                                <div class="protocol-tree" id="protocolTree"></div>
+                            </div>
+                            <div class="tab-panel" id="hexPanel">
+                                <div class="hex-view" id="hexView"></div>
+                            </div>
+                            <div class="tab-panel" id="rawPanel">
+                                <pre class="raw-data" id="rawData"></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 空状态 -->
+                <div class="empty-state" id="analyzeEmptyState">
+                    <div class="empty-icon">📊</div>
+                    <p>选择一个会话开始分析</p>
+                    <p class="hint">或从文件列表中创建新会话</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 数据包详情模态框 -->
+    <div class="modal" id="packetModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>数据包详情</h3>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="packet-summary" id="packetSummary"></div>
+                <div class="detail-tabs">
+                    <button class="tab-btn active" data-tab="modal-tree">协议树</button>
+                    <button class="tab-btn" data-tab="modal-hex">十六进制</button>
+                </div>
+                <div class="tab-panel active" id="modalTreePanel">
+                    <div class="protocol-tree" id="modalProtocolTree"></div>
+                </div>
+                <div class="tab-panel" id="modalHexPanel">
+                    <div class="hex-view" id="modalHexView"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载动画 -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">处理中...</div>
+    </div>
+
+    <!-- 提示消息 -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- JavaScript -->
+    <script src="/static/js/app.js"></script>
+    <script src="/static/js/upload.js"></script>
+    <script src="/static/js/files.js"></script>
+    <script src="/static/js/packets.js"></script>
+    <script src="/static/js/detail.js"></script>
+    <script src="/static/js/stats.js"></script>
+</body>
+</html>
