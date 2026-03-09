@@ -29,10 +29,10 @@ type CreateSessionRequest struct {
 
 // SessionResponse 会话响应
 type SessionResponse struct {
-	SessionID    string    `json:"session_id"`
-	FileID       string    `json:"file_id"`
-	CreatedAt    time.Time `json:"created_at"`
-	ExpiresAt    time.Time `json:"expires_at"`
+	SessionID string    `json:"session_id"`
+	FileID    string    `json:"file_id"`
+	CreatedAt time.Time `json:"created_at"`
+	ExpiresAt time.Time `json:"expires_at"`
 }
 
 // IsExpired 检查会话是否已过期

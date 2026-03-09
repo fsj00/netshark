@@ -1,0 +1,81 @@
+/* CSS 变量定义 - 深色主题 (类似 Wireshark) */
+:root {
+  /* 背景色 */
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #252525;
+  --bg-tertiary: #2d2d2d;
+  --bg-quaternary: #333333;
+  --bg-hover: #3a3a3a;
+  --bg-active: #404040;
+
+  /* 文字色 */
+  --text-primary: #e0e0e0;
+  --text-secondary: #a0a0a0;
+  --text-muted: #666666;
+  --text-inverse: #1a1a1a;
+
+  /* 边框 */
+  --border-color: #3d3d3d;
+  --border-light: #4d4d4d;
+  --border-focus: #4a9eff;
+
+  /* 强调色 */
+  --accent-color: #4a9eff;
+  --accent-hover: #3a8eef;
+  --accent-light: rgba(74, 158, 255, 0.1);
+
+  /* 状态色 */
+  --success-color: #4caf50;
+  --warning-color: #ff9800;
+  --error-color: #f44336;
+  --info-color: #2196f3;
+
+  /* 协议颜色 */
+  --protocol-tcp: #4caf50;
+  --protocol-udp: #2196f3;
+  --protocol-http: #ff9800;
+  --protocol-https: #9c27b0;
+  --protocol-dns: #00bcd4;
+  --protocol-icmp: #f44336;
+  --protocol-arp: #795548;
+
+  /* 尺寸 */
+  --header-height: 3.5rem;
+  --sidebar-width: 16rem;
+  --border-radius: 0.375rem;
+  --border-radius-lg: 0.5rem;
+
+  /* 过渡 */
+  --transition-fast: 150ms ease;
+  --transition-base: 200ms ease;
+
+  /* 阴影 */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-light);
+}
+
+/* 选中文本样式 */
+::selection {
+  background: var(--accent-color);
+  color: var(--text-primary);
+}

@@ -31,10 +31,13 @@ func main() {
 		log.Fatalf("Failed to create file repository: %v", err)
 	}
 
+	// 创建会话仓库
+	sessionRepo := repository.NewSessionRepository()
+
 	// 创建服务
 	pcapSvc := service.NewPCAPService(fileRepo)
 	sharkdSvc := service.NewSharkdService(cfg.Sharkd.BinaryPath)
-	sessionSvc := service.NewSessionService(cfg.Session.Timeout, sharkdSvc, pcapSvc)
+	sessionSvc := service.NewSessionService(sessionRepo, fileRepo, cfg.Session.Timeout, cfg.Sharkd.BinaryPath)
 
 	// 创建处理器
 	pcapHandler := handler.NewPCAPHandler(pcapSvc)
@@ -91,7 +94,7 @@ func main() {
 	}
 
 	// 关闭所有sharkd会话
-	sharkdSvc.CloseAll()
+	sharkdSvc.StopAll()
 
 	log.Println("Server exited")
 }

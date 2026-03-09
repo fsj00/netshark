@@ -25,17 +25,13 @@ type PCAPService interface {
 
 // pcapService PCAP服务实现
 type pcapService struct {
-	fileRepo      repository.FileRepository
-	expireDays    int
-	maxFileSize   int64
+	fileRepo repository.FileRepository
 }
 
 // NewPCAPService 创建新的PCAP服务
-func NewPCAPService(fileRepo repository.FileRepository, expireDays int, maxFileSize int64) PCAPService {
+func NewPCAPService(fileRepo repository.FileRepository) PCAPService {
 	return &pcapService{
-		fileRepo:    fileRepo,
-		expireDays:  expireDays,
-		maxFileSize: maxFileSize,
+		fileRepo: fileRepo,
 	}
 }
 

@@ -23,6 +23,8 @@ type FileRepository interface {
 	GetByID(fileID string) (*model.PCAPFile, bool)
 	// GetByHash 通过SHA256哈希获取文件信息
 	GetByHash(hash string) (*model.PCAPFile, bool)
+	// GetFilePath 通过文件ID获取文件路径
+	GetFilePath(fileID string) (string, error)
 	// Delete 删除文件
 	Delete(fileID string) error
 	// List 获取文件列表
@@ -141,26 +143,26 @@ func (r *fileRepository) Save(filename string, reader io.Reader) (*model.PCAPFil
 	hashStr := hex.EncodeToString(hash[:])
 
 	// 检查文件是否已存在
-	r.mu.RLock()
+	r.mu.Lock()
 	if existingID, exists := r.hashIndex[hashStr]; exists {
 		existingFile := r.files[existingID]
 		existingFile.LastAccessed = time.Now()
-		r.mu.RUnlock()
-		return existingFile, nil
+		// 返回副本
+		fileCopy := *existingFile
+		r.mu.Unlock()
+		return &fileCopy, nil
 	}
-	r.mu.RUnlock()
 
 	// 生成文件ID (使用哈希前16位)
 	fileID := hashStr[:16]
 
 	// 检查文件ID是否冲突
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
 	if _, exists := r.files[fileID]; exists {
 		// 如果ID冲突但哈希不同，添加时间戳后缀
 		fileID = fmt.Sprintf("%s_%d", fileID, time.Now().UnixNano())
 	}
+
+	defer r.mu.Unlock()
 
 	// 保存文件
 	path := filepath.Join(r.uploadDir, fileID)
@@ -187,20 +189,24 @@ func (r *fileRepository) Save(filename string, reader io.Reader) (*model.PCAPFil
 
 // GetByID 通过文件ID获取文件信息
 func (r *fileRepository) GetByID(fileID string) (*model.PCAPFile, bool) {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
+	r.mu.Lock()
+	defer r.mu.Unlock()
 
 	file, exists := r.files[fileID]
-	if exists {
-		file.LastAccessed = time.Now()
+	if !exists {
+		return nil, false
 	}
-	return file, exists
+	// 更新访问时间
+	file.LastAccessed = time.Now()
+	// 返回副本避免外部修改
+	fileCopy := *file
+	return &fileCopy, true
 }
 
 // GetByHash 通过SHA256哈希获取文件信息
 func (r *fileRepository) GetByHash(hash string) (*model.PCAPFile, bool) {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
+	r.mu.Lock()
+	defer r.mu.Unlock()
 
 	fileID, exists := r.hashIndex[hash]
 	if !exists {
@@ -209,7 +215,9 @@ func (r *fileRepository) GetByHash(hash string) (*model.PCAPFile, bool) {
 
 	file := r.files[fileID]
 	file.LastAccessed = time.Now()
-	return file, true
+	// 返回副本避免外部修改
+	fileCopy := *file
+	return &fileCopy, true
 }
 
 // Delete 删除文件
@@ -241,7 +249,9 @@ func (r *fileRepository) List() []*model.PCAPFile {
 
 	result := make([]*model.PCAPFile, 0, len(r.files))
 	for _, file := range r.files {
-		result = append(result, file)
+		// 返回副本
+		fileCopy := *file
+		result = append(result, &fileCopy)
 	}
 
 	return result
@@ -271,6 +281,18 @@ func (r *fileRepository) CleanupExpired(maxAge time.Duration) error {
 	}
 
 	return nil
+}
+
+// GetFilePath 通过文件ID获取文件路径
+func (r *fileRepository) GetFilePath(fileID string) (string, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	file, exists := r.files[fileID]
+	if !exists {
+		return "", fmt.Errorf("file not found: %s", fileID)
+	}
+	return file.Path, nil
 }
 
 // DetectContentType 检测文件内容类型

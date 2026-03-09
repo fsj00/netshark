@@ -84,10 +84,7 @@ func (s *sharkdService) StopClient(sessionID string) error {
 	}
 
 	// 关闭客户端
-	if err := client.Close(); err != nil {
-		// 记录错误但继续清理
-		// logger.Warnf("failed to close sharkd client: %v", err)
-	}
+	_ = client.Close()
 
 	delete(s.clients, sessionID)
 	return nil
@@ -283,10 +280,8 @@ func (s *sharkdService) StopAll() {
 	defer s.mu.Unlock()
 
 	for sessionID, client := range s.clients {
-		if err := client.Close(); err != nil {
-			// 记录错误
-			_ = sessionID // 避免未使用变量警告
-		}
+		_ = sessionID
+		_ = client.Close()
 		delete(s.clients, sessionID)
 	}
 }

@@ -16,12 +16,12 @@ import (
 
 // SessionService 会话服务
 type SessionService struct {
-	repo         *repository.SessionRepository
-	fileRepo     *repository.FileRepository
-	timeout      time.Duration
-	sharkdPath   string
-	clients      map[string]*sharkd.Client
-	clientsMu    sync.RWMutex
+	repo       *repository.SessionRepository
+	fileRepo   *repository.FileRepository
+	timeout    time.Duration
+	sharkdPath string
+	clients    map[string]*sharkd.Client
+	clientsMu  sync.RWMutex
 }
 
 // NewSessionService 创建会话服务
@@ -91,6 +91,11 @@ func (s *SessionService) GetSession(sessionID string) (*model.Session, error) {
 		return nil, fmt.Errorf("session not found or expired: %s", sessionID)
 	}
 
+	// 检查会话是否过期
+	if session.IsExpired() {
+		return nil, fmt.Errorf("session expired: %s", sessionID)
+	}
+
 	// 刷新过期时间
 	s.repo.RefreshSession(sessionID, s.timeout)
 
@@ -137,7 +142,8 @@ func (s *SessionService) CloseSession(sessionID string) error {
 
 // CleanupExpiredSessions 定期清理过期会话
 func (s *SessionService) CleanupExpiredSessions(ctx context.Context) {
-	ticker := time.NewTicker(5 * time.Minute)
+	const cleanupInterval = 5 * time.Minute
+	ticker := time.NewTicker(cleanupInterval)
 	defer ticker.Stop()
 
 	for {
@@ -157,7 +163,7 @@ func (s *SessionService) cleanup() {
 	s.clientsMu.Lock()
 	for _, id := range expiredIDs {
 		if client, ok := s.clients[id]; ok {
-			client.Close()
+			_ = client.Close()
 			delete(s.clients, id)
 			log.Printf("Cleaned up expired session %s", id)
 		}
@@ -169,7 +175,7 @@ func (s *SessionService) cleanup() {
 func (s *SessionService) CloseAllSessions() {
 	s.clientsMu.Lock()
 	for id, client := range s.clients {
-		client.Close()
+		_ = client.Close()
 		delete(s.clients, id)
 		log.Printf("Closed session %s", id)
 	}
@@ -178,7 +184,7 @@ func (s *SessionService) CloseAllSessions() {
 	// 清理所有会话记录
 	sessions := s.repo.GetAllSessions()
 	for _, session := range sessions {
-		s.repo.DeleteSession(session.SessionID)
+		_ = s.repo.DeleteSession(session.SessionID)
 	}
 }
 

@@ -46,12 +46,19 @@ func (h *PacketHandler) ListPackets(c *gin.Context) {
 		return
 	}
 
+	// 验证offset
+	if params.Offset < 0 {
+		params.Offset = 0
+	}
+
 	// 限制最大返回数量
-	if params.Limit > 1000 {
-		params.Limit = 1000
+	const maxPacketLimit = 1000
+	const defaultPacketLimit = 100
+	if params.Limit > maxPacketLimit {
+		params.Limit = maxPacketLimit
 	}
 	if params.Limit <= 0 {
-		params.Limit = 100
+		params.Limit = defaultPacketLimit
 	}
 
 	// 获取数据包
@@ -103,7 +110,7 @@ func (h *PacketHandler) GetPacket(c *gin.Context) {
 
 	// 解析数据包序号
 	num, err := strconv.Atoi(numStr)
-	if err != nil {
+	if err != nil || num <= 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    400,
 			"message": "Invalid packet number",

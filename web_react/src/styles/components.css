@@ -1,0 +1,348 @@
+/* 组件特定样式 */
+
+/* 上传区域 */
+.upload-area {
+  @apply relative border-2 border-dashed border-border rounded-xl p-12 text-center
+         transition-all duration-200 cursor-pointer hover:border-accent hover:bg-accent-light;
+}
+
+.upload-area.dragover {
+  @apply border-accent bg-accent-light;
+}
+
+.upload-area-icon {
+  @apply text-6xl mb-4 opacity-70;
+}
+
+.upload-area-text {
+  @apply text-lg font-medium text-text-primary mb-2;
+}
+
+.upload-area-hint {
+  @apply text-sm text-text-secondary;
+}
+
+/* 进度条 */
+.progress-bar {
+  @apply w-full h-2 bg-dark-tertiary rounded-full overflow-hidden;
+}
+
+.progress-fill {
+  @apply h-full bg-accent rounded-full transition-all duration-200;
+}
+
+/* 虚拟列表 */
+.virtual-list {
+  @apply relative overflow-auto;
+}
+
+.virtual-list-content {
+  @apply relative;
+}
+
+.virtual-list-item {
+  @apply absolute left-0 right-0;
+}
+
+/* 数据包行 */
+.packet-row {
+  @apply flex items-center px-4 py-2 text-sm border-b border-border cursor-pointer
+         hover:bg-dark-tertiary transition-colors duration-100;
+}
+
+.packet-row.selected {
+  @apply bg-accent-light;
+}
+
+.packet-row .col-num {
+  @apply w-16 text-text-muted font-mono text-xs;
+}
+
+.packet-row .col-time {
+  @apply w-28 text-text-secondary font-mono text-xs;
+}
+
+.packet-row .col-src,
+.packet-row .col-dst {
+  @apply w-36 text-text-primary font-mono text-xs truncate;
+}
+
+.packet-row .col-proto {
+  @apply w-20 text-center;
+}
+
+.packet-row .col-len {
+  @apply w-16 text-text-secondary text-right font-mono;
+}
+
+.packet-row .col-info {
+  @apply flex-1 text-text-secondary truncate pl-4;
+}
+
+/* 模态框 */
+.modal-overlay {
+  @apply fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-200;
+}
+
+.modal-content {
+  @apply fixed z-50 bg-dark-secondary rounded-lg shadow-lg overflow-hidden
+         transition-all duration-200;
+  max-height: 90vh;
+  max-width: 90vw;
+}
+
+.modal-header {
+  @apply flex items-center justify-between px-6 py-4 border-b border-border;
+}
+
+.modal-title {
+  @apply text-lg font-semibold text-text-primary;
+}
+
+.modal-close {
+  @apply text-text-muted hover:text-text-primary transition-colors duration-150
+         focus:outline-none;
+}
+
+.modal-body {
+  @apply p-6 overflow-auto;
+}
+
+/* 标签页 */
+.tabs {
+  @apply flex border-b border-border;
+}
+
+.tab-btn {
+  @apply px-4 py-2 text-sm font-medium text-text-secondary border-b-2 border-transparent
+         transition-all duration-150 hover:text-text-primary focus:outline-none;
+}
+
+.tab-btn.active {
+  @apply text-accent border-accent;
+}
+
+.tab-panel {
+  @apply hidden;
+}
+
+.tab-panel.active {
+  @apply block;
+}
+
+/* Toast 提示 */
+.toast-container {
+  @apply fixed bottom-4 right-4 z-50 flex flex-col gap-2;
+}
+
+.toast {
+  @apply flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg min-w-[300px]
+         animate-slide-up;
+}
+
+.toast-success {
+  @apply bg-status-success bg-opacity-10 border border-status-success text-status-success;
+}
+
+.toast-error {
+  @apply bg-status-error bg-opacity-10 border border-status-error text-status-error;
+}
+
+.toast-warning {
+  @apply bg-status-warning bg-opacity-10 border border-status-warning text-status-warning;
+}
+
+.toast-info {
+  @apply bg-status-info bg-opacity-10 border border-status-info text-status-info;
+}
+
+/* 统计卡片 */
+.stat-card {
+  @apply bg-dark-secondary border border-border rounded-lg p-4;
+}
+
+.stat-card-value {
+  @apply text-2xl font-bold text-text-primary;
+}
+
+.stat-card-label {
+  @apply text-sm text-text-secondary mt-1;
+}
+
+/* 图表容器 */
+.chart-container {
+  @apply bg-dark-secondary border border-border rounded-lg p-4;
+}
+
+.chart-title {
+  @apply text-sm font-semibold text-text-primary mb-4;
+}
+
+/* 侧边栏 */
+.sidebar {
+  @apply w-64 bg-dark-secondary border-r border-border flex flex-col;
+}
+
+.sidebar-item {
+  @apply flex items-center gap-3 px-4 py-3 text-text-secondary hover:text-text-primary
+         hover:bg-dark-tertiary transition-colors duration-150 cursor-pointer;
+}
+
+.sidebar-item.active {
+  @apply text-accent bg-accent-light border-r-2 border-accent;
+}
+
+.sidebar-icon {
+  @apply w-5 h-5;
+}
+
+/* 导航栏 */
+.navbar {
+  @apply h-header bg-dark-secondary border-b border-border flex items-center px-6;
+}
+
+.navbar-brand {
+  @apply flex items-center gap-2 text-xl font-bold text-text-primary;
+}
+
+.navbar-nav {
+  @apply flex items-center gap-1 ml-8;
+}
+
+.nav-link {
+  @apply px-4 py-2 text-sm font-medium text-text-secondary rounded-md
+         hover:text-text-primary hover:bg-dark-tertiary transition-all duration-150;
+}
+
+.nav-link.active {
+  @apply text-accent bg-accent-light;
+}
+
+/* 搜索框 */
+.search-box {
+  @apply relative flex items-center;
+}
+
+.search-input {
+  @apply w-80 pl-10 pr-4 py-2 bg-dark-tertiary border border-border rounded-lg
+         text-sm text-text-primary placeholder-text-muted focus:outline-none
+         focus:border-accent focus:ring-1 focus:ring-accent transition-all duration-150;
+}
+
+.search-icon {
+  @apply absolute left-3 text-text-muted;
+}
+
+/* 下拉选择 */
+.select {
+  @apply appearance-none px-4 py-2 pr-10 bg-dark-secondary border border-border
+         rounded-md text-sm text-text-primary focus:outline-none focus:border-accent
+         focus:ring-1 focus:ring-accent cursor-pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+}
+
+/* 分页 */
+.pagination {
+  @apply flex items-center gap-2;
+}
+
+.pagination-btn {
+  @apply px-3 py-1.5 text-sm font-medium text-text-secondary bg-dark-secondary
+         border border-border rounded-md hover:text-text-primary hover:bg-dark-tertiary
+         disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150;
+}
+
+.pagination-info {
+  @apply text-sm text-text-secondary;
+}
+
+/* 过滤器标签 */
+.filter-tag {
+  @apply inline-flex items-center gap-1 px-2 py-1 text-xs font-medium
+         bg-accent-light text-accent rounded-md;
+}
+
+.filter-tag-close {
+  @apply hover:text-accent-hover cursor-pointer;
+}
+
+/* 文件列表项 */
+.file-item {
+  @apply flex items-center gap-4 p-4 bg-dark-secondary border border-border rounded-lg
+         hover:border-border-light transition-colors duration-150;
+}
+
+.file-icon {
+  @apply w-10 h-10 flex items-center justify-center bg-dark-tertiary rounded-lg text-2xl;
+}
+
+.file-info {
+  @apply flex-1 min-w-0;
+}
+
+.file-name {
+  @apply text-sm font-medium text-text-primary truncate;
+}
+
+.file-meta {
+  @apply text-xs text-text-secondary mt-0.5;
+}
+
+/* 状态指示器 */
+.status-indicator {
+  @apply flex items-center gap-2 text-sm;
+}
+
+.status-dot {
+  @apply w-2 h-2 rounded-full;
+}
+
+.status-dot.online {
+  @apply bg-status-success;
+}
+
+.status-dot.offline {
+  @apply bg-status-error;
+}
+
+.status-dot.processing {
+  @apply bg-status-warning animate-pulse;
+}
+
+/* 加载遮罩 */
+.loading-overlay {
+  @apply fixed inset-0 bg-dark-primary bg-opacity-80 z-50 flex flex-col items-center
+         justify-center;
+}
+
+.loading-spinner {
+  @apply w-12 h-12 border-4 border-border border-t-accent rounded-full animate-spin;
+}
+
+.loading-text {
+  @apply mt-4 text-text-secondary;
+}
+
+/* 错误边界 */
+.error-boundary {
+  @apply flex flex-col items-center justify-center min-h-[400px] p-8 text-center;
+}
+
+.error-boundary-icon {
+  @apply text-6xl mb-4;
+}
+
+.error-boundary-title {
+  @apply text-xl font-semibold text-text-primary mb-2;
+}
+
+.error-boundary-message {
+  @apply text-text-secondary mb-6 max-w-md;
+}
+
+.error-boundary-stack {
+  @apply text-left text-xs text-text-muted bg-dark-secondary p-4 rounded-lg
+         max-w-2xl max-h-64 overflow-auto font-mono;
+}
